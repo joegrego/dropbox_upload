@@ -36,7 +36,7 @@ import humanize
 from dropbox import DropboxOAuth2FlowNoRedirect, common
 
 # you'll want to create a new dropbox app key for each new dropbox app you write
-APP_KEY = os.environ("MY_DROPBOX_API_KEY")
+APP_KEY = os.environ["MY_DROPBOX_API_KEY"]
 TIMEOUT = 900
 CHUNK_SIZE = 4 * 1024 * 1024
 # and probably you should use the name of your program, not mine, for the configuration file.
@@ -175,7 +175,7 @@ def big_file_upload(source, destination, interactive=True, use_team_root=True, p
                 logger.debug(f"Using 'user' namespace (WARNING! this may not be what you wanted!)")
 
             uploaded_path = upload(file_path=source, target_path=destination, dbx=dbx, autorename=autorename)
-            return_struct["path"] = uploaded_path
+            return_struct["dropbox_path"] = uploaded_path
 
             if password:
                 # https://dropbox-sdk-python.readthedocs.io/en/latest/api/sharing.html#dropbox.sharing.SharedLinkSettings
@@ -288,7 +288,7 @@ if __name__ == '__main__':
 
     dropbox_input_path = args.source
     password = args.password
-    expiraton_date = None
+    expiration_date = None
 
     if args.zip:
         if args.zip_file_path:

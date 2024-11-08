@@ -5,7 +5,7 @@ This tool was originally developed for the University of Michigan Advanced Genom
 
 # Setup 
 ```
-python3 -v venv venv
+python3 -m venv venv
 source ./venv/bin/activate
 pip install -r requirements.txt
 export MY_DROPBOX_API_KEY=NonyaBizzness
@@ -20,3 +20,8 @@ python3 dropbox_upload.py -z -l info -s /path/to/mydir -d "/CompanyDropboxShare/
 ```
 python3 dropbox_upload.py -s /path/to/mybigfile.big -d "/bigfiles/mybigfile.big" --root user
 ```
+
+# Dropbox is weird about duplicate file contents
+Dropbox will, in essence, ignore an upload of a file with the same name and the same contents. That means that although you specify `-ar`, you may not get a "new" file (like with parenthesis and a number). That's a Dropbox thing, and if you don't like it, call them.
+
+When testing with the same file over and over again, you probably want to delete the "target" file in dropbox each time. 
