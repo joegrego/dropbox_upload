@@ -30,8 +30,12 @@ When testing with the same file over and over again, you probably want to delete
 Dropbox's API doesn't have a way to do a "Dropbox Transfer" (although they do have a way to do a Share, which is NOT the same).  To do a fake dbox transfer, you can do something like this:
 
 ```
+    the_folder = args.the_folder
+    the_dropbox_path = args.the_dropbox_path  # like "MED-agc-sharedfiles"
+    temporary_dir_path = args.the_temp_dir_path  # like "/tmp"
+
     current_time_string = datetime.now().strftime("%Y%m%d%H%M%S")
-    delivery_file_name_with_time = f"{the_file_name}__dropbox_{current_time_string}"
+    delivery_file_name_with_time = f"{the_folder}__dropbox_{current_time_string}"
 
     #
     # Pull the files down from Dropbox
@@ -85,4 +89,15 @@ Dropbox's API doesn't have a way to do a "Dropbox Transfer" (although they do ha
         text_file.writelines(text_lines)
 
     logger.info(f"Created {text_file_path}")
+
+    #
+    # Clean up
+    #
+    #os.remove(zip_file_path)
+    #logger.info(f"Deleted {zip_file_path}")
+    #os.remove(text_file_path)
+    #logger.info(f"Deleted {text_file_path}")
+    #shutil.rmtree(dropbox_pull_target, ignore_errors=True)
+    #logger.info(f"Deleted folder {dropbox_pull_target}")
+
 ```
