@@ -29,7 +29,7 @@ When testing with the same file over and over again, you probably want to delete
 # Faking a "Dropbox Transfer"
 Dropbox's API doesn't have a way to do a "Dropbox Transfer" (although they do have a way to do a Share, which is NOT the same).  To do a fake dbox transfer, you can do something like this:
 
-```
+```python
     the_folder = args.the_folder
     the_dropbox_path = args.the_dropbox_path  # like "MED-agc-sharedfiles"
     temporary_dir_path = args.the_temp_dir_path  # like "/tmp"
