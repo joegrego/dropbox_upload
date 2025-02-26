@@ -120,6 +120,73 @@ def make_user_login_to_get_tokens():
 
     return oauth_result
 
+def download_file(dbx, dropbox_path, local_path):
+    """Download a file from Dropbox to a local directory."""
+    with open(local_path, "wb") as f:
+        metadata, res = dbx.files_download(dropbox_path)
+        f.write(res.content)
+
+
+def download_folder(dbx, folder_path, local_dir):
+    """Download an entire folder from Dropbox to a local directory."""
+    total_files = 0
+    total_folders = 0
+
+    try:
+        os.makedirs(local_dir, exist_ok=True)
+        response = dbx.files_list_folder(folder_path)
+
+        while True:
+            for entry in response.entries:
+                if isinstance(entry, dropbox.files.FileMetadata):
+                    local_file_path = os.path.join(local_dir, entry.name)
+                    logger.info(f"Downloading file {local_file_path}")
+                    download_file(dbx, entry.path_lower, local_file_path)
+                    total_files += 1
+                elif isinstance(entry, dropbox.files.FolderMetadata):
+                    new_local_dir = os.path.join(local_dir, entry.name)
+                    logger.info(f"Creating folder {new_local_dir}")
+                    sub_files, sub_folders = download_folder(dbx, entry.path_lower, new_local_dir)
+                    total_folders += 1 + sub_folders
+                    total_files += sub_files
+
+            if not response.has_more:
+                break
+            response = dbx.files_list_folder_continue(response.cursor)
+
+    except dropbox.exceptions.ApiError as err:
+        logger.critical(f"API error: {err}")
+        raise
+
+    return total_files, total_folders
+
+
+def big_download_directory(dropbox_path, local_dir, interactive=False, use_team_root=True):
+    global refresh_token
+    if not refresh_token:
+        logger.debug("getting refresh token")
+        refresh_token = get_refresh_token(interactive)
+    else:
+        logger.debug("reusing refresh token")
+
+    with dropbox.Dropbox(oauth2_refresh_token=refresh_token, app_key=APP_KEY) as dbx:
+        try:
+            if use_team_root:
+                root_namespace_id = dbx.users_get_current_account().root_info.root_namespace_id
+                dbx = dbx.with_path_root(dropbox.common.PathRoot('root', value=root_namespace_id))
+                logger.debug(f"Using team namespace id {root_namespace_id}")
+            else:
+                logger.debug("Using 'user' namespace (WARNING! this may not be what you wanted!)")
+
+            total_files, total_folders = download_folder(dbx, dropbox_path, local_dir)
+
+        except Exception as ex:
+            logger.critical(f"ERROR: Dropbox upload Failed with error:\n{ex}")
+            raise
+
+        logger.info(f"Downloaded {total_files} files and {total_folders} folders")
+        return total_files, total_folders
+
 
 def upload(file_path, target_path, dbx, autorename=False):
     with open(file_path, "rb") as f:
