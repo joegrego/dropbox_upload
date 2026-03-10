@@ -4,12 +4,18 @@ Tool for uploading large files to dropbox with an option to zip-and-share-a-down
 This tool was originally developed for the University of Michigan Advanced Genomics Core. I put it here to share with other developers who are trying to use the Python Dropbox API.
 
 # Setup 
+You need a dropbox api "App Key".  You can't have mine (but you may want to share yours with your user base). You can create a dropbox app at https://www.dropbox.com/developers/apps/create.  Google "dropbox api key" for more information.
+
+Important Safety Note: `NonyaBizzness` is not a valid dropbox api key!
+
 ```
 python3 -m venv venv
 source ./venv/bin/activate
 pip install -r requirements.txt
 export MY_DROPBOX_API_KEY=NonyaBizzness
 ```
+
+
 
 # To zip a directory, upload it, and get a public download-only link to that zip (in dropbox) that expires in 2 weeks
 ```
