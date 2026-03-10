@@ -314,8 +314,7 @@ def convert_dropbox_url_into_download_only(the_url):
     return (updated_url)
 
 
-if __name__ == '__main__':
-
+def main():
     parser = argparse.ArgumentParser(description="Send exactly one file to Dropbox.")
     parser.add_argument("-s", "--source", default="", required=False,
                         help="Source file to copy from on computer"),
@@ -407,3 +406,7 @@ if __name__ == '__main__':
             with open(args.output, "w") as f:
                 f.write(json.dumps(output_json, indent=4))
         logger.info(json.dumps(output_json, indent=4))
+
+
+if __name__ == '__main__':
+    main()
