@@ -68,7 +68,7 @@ def add_logging_arg(parser):
 def get_refresh_token(interactive):
     """
     Use refresh tokens, stored in a config file, so you only have to use the login page cut/paste nonsense one time.
-    :param interactive: True/False to run this function interactively or fail if can't find token
+    :param interactive: True/False to run this function interactively or fail if it can't find token
     :return:
     """
     config = configparser.ConfigParser()
@@ -119,6 +119,7 @@ def make_user_login_to_get_tokens():
         sys.exit(42)
 
     return oauth_result
+
 
 def download_file(dbx, dropbox_path, local_path):
     """Download a file from Dropbox to a local directory."""
@@ -311,7 +312,7 @@ def convert_dropbox_url_into_download_only(the_url):
     # Reconstruct the URL with the new query parameter  (thanks, umgpt!)
     new_query_string = urlencode(query_params, doseq=True)
     updated_url = urlunparse((parsed_url.scheme, parsed_url.netloc, parsed_url.path, parsed_url.params, new_query_string, parsed_url.fragment))
-    return (updated_url)
+    return updated_url
 
 
 def main():
