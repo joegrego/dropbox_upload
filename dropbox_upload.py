@@ -19,6 +19,7 @@ pip install humanize
 
 import argparse
 import configparser
+import encodings
 import json
 import logging
 import os
@@ -45,7 +46,7 @@ refresh_token = None
 logger = logging.getLogger(__name__)
 
 
-def set_logging_level(logging_level, logger):
+def set_logging_level(logging_level, the_logger):
     level = logging.WARNING
     if logging_level == 'error':
         level = logging.ERROR
@@ -57,7 +58,7 @@ def set_logging_level(logging_level, logger):
         level = logging.DEBUG
 
     logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-    logger.setLevel(level=level)
+    the_logger.setLevel(level=level)
 
 
 def add_logging_arg(parser):
@@ -85,7 +86,7 @@ def get_refresh_token(interactive):
         config[APP_KEY]['account_id'] = tokens.account_id
         config[APP_KEY]['scope'] = str(tokens.scope)
         config[APP_KEY]['expiration'] = str(tokens.expires_at)
-        with open(my_config_file, 'w') as configfile:
+        with open(my_config_file, 'w', encoding=encodings.utf_8) as configfile:
             config.write(configfile)
         logger.info(f"Configuration saved to {my_config_file}")
     else:
@@ -124,7 +125,7 @@ def make_user_login_to_get_tokens():
 def download_file(dbx, dropbox_path, local_path):
     """Download a file from Dropbox to a local directory."""
     with open(local_path, "wb") as f:
-        metadata, res = dbx.files_download(dropbox_path)
+        _, res = dbx.files_download(dropbox_path)
         f.write(res.content)
 
 
@@ -240,7 +241,7 @@ def big_file_upload(source, destination, interactive=True, use_team_root=True, p
                 dbx = dbx.with_path_root(dropbox.common.PathRoot('root', value=root_namespace_id))
                 logger.debug(f"Using team namespace id {root_namespace_id}")
             else:
-                logger.debug(f"Using 'user' namespace (WARNING! this may not be what you wanted!)")
+                logger.debug("Using 'user' namespace (WARNING! this may not be what you wanted!)")
 
             uploaded_path = upload(file_path=source, target_path=destination, dbx=dbx, autorename=autorename)
             return_struct["dropbox_path"] = uploaded_path
@@ -277,7 +278,7 @@ def zip_folder(folder_path, output_path):
     Zip the folder_path into a file in the output_path.
     """
     with zipfile.ZipFile(output_path, 'x', zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(folder_path):
+        for root, _, files in os.walk(folder_path):
             for file in files:
                 file_path = os.path.join(root, file)
                 relative_path = os.path.relpath(file_path, folder_path)  # Preserve folder structure
@@ -318,7 +319,7 @@ def convert_dropbox_url_into_download_only(the_url):
 def main():
     parser = argparse.ArgumentParser(description="Send exactly one file to Dropbox.")
     parser.add_argument("-s", "--source", default="", required=False,
-                        help="Source file to copy from on computer"),
+                        help="Source file to copy from on computer")
     parser.add_argument("-d", "--destination", default="", required=False,
                         help="Destination folder path in DropBox")
     parser.add_argument("-a", "--authenticate", action="store_true", help="Only authenticate without transferring")
@@ -404,7 +405,7 @@ def main():
             "dropbox_path": upload_return["dropbox_path"]
         }
         if args.output:
-            with open(args.output, "w") as f:
+            with open(args.output, "w", encoding=encodings.utf_8) as f:
                 f.write(json.dumps(output_json, indent=4))
         logger.info(json.dumps(output_json, indent=4))
 
